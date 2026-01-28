@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>College Attendance Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; min-height: 100vh; margin: 0; }
+        #app-frame { width: 100%; max-width: 450px; background-color: white; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.1); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
+        /* Button Styles */
+        .status-btn { transition: all 0.2s ease; }
+        .btn-present.active { background-color: #10b981; color: white; border-color: #10b981; }
+        .btn-absent.active { background-color: #ef4444; color: white; border-color: #ef4444; }
+        
+        /* Table Styles for Report */
+        .report-table { width: 100%; text-align: left; font-size: 12px; border-collapse: collapse; }
+        .report-table th { background-color: #f3f4f6; padding: 8px; color: #4b5563; }
+        .report-table td { padding: 8px; border-bottom: 1px solid #e5e7eb; }
+        
+        .spinner { border: 4px solid rgba(0, 0, 0, 0.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: #09f; animation: spin 1s ease infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div id="app-frame">
+    
+    <!-- ================= LOGIN (UPDATED WITH LOGO) ================= -->
+    <div id="page-login" class="flex flex-col items-center justify-center h-full p-8 bg-white z-50">
+        
+        <!-- LOGO SECTION START -->
+        <div class="mb-8 text-center">
+            <!-- Ensure you have a file named 'logo.png' in the same folder -->
+            <img src="logo.png" onerror="this.src='https://via.placeholder.com/150?text=LOGO'" alt="College Logo" class="w-42 h-42 object-contain mx-auto mb-2">
+            <h1 class="text-xl font-bold text-gray-800">Attendance System</h1>
+        </div>
+        <!-- LOGO SECTION END -->
+
+        <h2 class="text-sm font-bold text-gray-500 mb-6 uppercase tracking-wider">Faculty Login</h2>
+        
+        <div class="w-full space-y-4">
+            <input type="email" id="login-email" class="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl focus:bg-white focus:border-blue-500 transition" placeholder="admin@college.edu">
+            <input type="password" id="login-password" class="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl focus:bg-white focus:border-blue-500 transition" placeholder="Password">
+        </div>
+        <p id="login-msg" class="text-red-500 text-sm mt-4 min-h-[20px]"></p>
+        <button onclick="app.login()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl mt-6 shadow-lg active:scale-95 transition">LOGIN</button>
+    </div>
+
+    <!-- ================= DASHBOARD ================= -->
+    <div id="page-dashboard" class="hidden flex-col h-full bg-gray-50">
+        <!-- Navbar -->
+        <div class="bg-white px-6 py-4 pt-10 shadow-sm flex justify-between items-center z-10">
+            <div>
+                <h1 class="text-xl font-bold text-gray-800">Attendance</h1>
+                <p class="text-xs text-gray-500" id="current-user-display">Teacher</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="app.generateReport()" class="text-blue-600 bg-blue-50 px-3 py-1 rounded text-xs font-bold border border-blue-100">
+                    <i class="fas fa-chart-pie mr-1"></i> Report
+                </button>
+                <button onclick="app.logout()" class="text-gray-400 hover:text-red-500"><i class="fas fa-sign-out-alt text-xl"></i></button>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="px-4 py-4 bg-white border-b border-gray-100 flex gap-3">
+            <div class="flex-1">
+                <label class="text-[10px] font-bold text-gray-400 uppercase">Class</label>
+                <select id="class-select" onchange="app.loadStudents()" class="w-full bg-gray-100 rounded-lg p-2 font-semibold text-gray-700">
+                    <option value="" disabled selected>Select Class</option>
+                    <option value="ECE-A">ECE-A</option>
+                    <option value="ECE-B">ECE-B</option>
+                    <option value="ECE-C">ECE-C</option>
+                </select>
+            </div>
+            <div class="w-1/3">
+                <label class="text-[10px] font-bold text-gray-400 uppercase">Date</label>
+                <input type="date" id="date-select" class="w-full bg-gray-100 rounded-lg p-2 text-sm font-semibold text-gray-700">
+            </div>
+        </div>
+
+        <!-- List -->
+        <div id="student-list-container" class="flex-1 overflow-y-auto p-4 pb-24">
+            <div class="text-center mt-20 text-gray-400">
+                <i class="fas fa-user-graduate text-4xl mb-3 opacity-30"></i>
+                <p>Select a class to start</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="absolute bottom-0 w-full bg-white p-4 shadow-[0_-5px_20px_rgba(0,0,0,0.05)] border-t border-gray-100">
+            <div class="flex justify-between text-xs font-bold text-gray-500 mb-3 px-1">
+                <span id="stat-total">Total: 0</span>
+                <span class="text-green-600" id="stat-present">P: 0</span>
+                <span class="text-red-500" id="stat-absent">A: 0</span>
+            </div>
+            <button onclick="app.submitAttendance()" id="btn-submit" disabled class="w-full bg-gray-300 text-white font-bold py-3.5 rounded-xl transition shadow-md">
+                SAVE SESSION RECORD
+            </button>
+        </div>
+    </div>
+
+    <!-- ================= REPORT MODAL ================= -->
+    <div id="report-modal" class="hidden absolute inset-0 bg-white z-[60] flex flex-col">
+        <div class="bg-blue-900 p-6 pt-10 text-white flex justify-between items-center shadow-lg">
+            <h2 class="text-lg font-bold">Performance Report</h2>
+            <button onclick="document.getElementById('report-modal').classList.add('hidden')" class="bg-blue-800 p-2 rounded-full w-8 h-8 flex items-center justify-center">✕</button>
+        </div>
+        <div class="p-4 bg-gray-100 border-b">
+            <h3 id="report-class-title" class="font-bold text-gray-700">Class Analysis</h3>
+            <p class="text-xs text-gray-500">Calculated from all saved sessions</p>
+        </div>
+        <div class="flex-1 overflow-y-auto p-4">
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th width="50%">Student</th>
+                        <th width="25%">Classes</th>
+                        <th width="25%">Percent</th>
+                    </tr>
+                </thead>
+                <tbody id="report-body">
+                    <!-- JS fills this -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- FIREBASE & APP LOGIC -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, setDoc, doc, query, where } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyApiGq4e2WuR3Ye_qTH9WJNRm5qxDv4s4s",
+      authDomain: "arcontrol-fcc95.firebaseapp.com",
+      databaseURL: "https://arcontrol-fcc95-default-rtdb.firebaseio.com",
+      projectId: "arcontrol-fcc95",
+      storageBucket: "arcontrol-fcc95.firebasestorage.app",
+      messagingSenderId: "234489665254",
+      appId: "1:234489665254:web:a00f7a2c2d7be377a88d27",
+      measurementId: "G-JR87RS27LZ"
+    };
+
+    const firebaseApp = initializeApp(firebaseConfig);
+    const auth = getAuth(firebaseApp);
+    const db = getFirestore(firebaseApp);
+
+    let students = [];
+    let attendance = {};
+    let currentUserEmail = "";
+
+    window.app = {
+        login: async () => {
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-password').value;
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+            } catch (error) {
+                document.getElementById('login-msg').innerText = "Invalid Login";
+            }
+        },
+
+        logout: () => signOut(auth),
+
+        loadStudents: async () => {
+            const className = document.getElementById('class-select').value;
+            const container = document.getElementById('student-list-container');
+            const btn = document.getElementById('btn-submit');
+            
+            if (!className) return;
+
+            container.innerHTML = `<div class="flex justify-center mt-10"><div class="spinner"></div></div>`;
+            try {
+                const snapshot = await getDocs(collection(db, "classes", className, "students"));
+                students = [];
+                attendance = {};
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if(data.roll && data.name) {
+                        students.push(data);
+                        attendance[data.roll] = "Present"; 
+                    }
+                });
+                students.sort((a, b) => a.roll.localeCompare(b.roll));
+                app.renderList();
+                
+                if(students.length > 0) {
+                    btn.disabled = false;
+                    btn.classList.remove('bg-gray-300');
+                    btn.classList.add('bg-blue-600');
+                } else {
+                    container.innerHTML = `<div class="text-center mt-10 text-gray-500">No students found.</div>`;
+                }
+            } catch (e) {
+                container.innerHTML = `<div class="text-red-500 text-center mt-10">Error loading data.</div>`;
+            }
+        },
+
+        renderList: () => {
+            const container = document.getElementById('student-list-container');
+            container.innerHTML = "";
+            students.forEach(s => {
+                const isPresent = attendance[s.roll] === "Present";
+                const card = document.createElement('div');
+                card.className = "bg-white p-4 rounded-xl mb-3 shadow-sm border border-gray-100 flex items-center justify-between";
+                card.innerHTML = `
+                    <div>
+                        <h4 class="font-bold text-gray-800 text-sm">${s.name}</h4>
+                        <p class="text-xs text-gray-400 font-mono mt-1">${s.roll}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="app.mark('${s.roll}', 'Present')" class="status-btn w-10 h-10 rounded-full border border-gray-200 text-xs font-bold text-gray-400 ${isPresent ? 'btn-present active' : ''}">P</button>
+                        <button onclick="app.mark('${s.roll}', 'Absent')" class="status-btn w-10 h-10 rounded-full border border-gray-200 text-xs font-bold text-gray-400 ${!isPresent ? 'btn-absent active' : ''}">A</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            app.updateStats();
+        },
+
+        mark: (roll, status) => {
+            attendance[roll] = status;
+            app.renderList();
+        },
+
+        updateStats: () => {
+            const total = students.length;
+            const present = Object.values(attendance).filter(s => s === "Present").length;
+            document.getElementById('stat-total').innerText = `Total: ${total}`;
+            document.getElementById('stat-present').innerText = `P: ${present}`;
+            document.getElementById('stat-absent').innerText = `A: ${total - present}`;
+        },
+
+        submitAttendance: async () => {
+            const className = document.getElementById('class-select').value;
+            const date = document.getElementById('date-select').value;
+            const btn = document.getElementById('btn-submit');
+
+            if(!date) return alert("Select Date");
+            btn.innerText = "SAVING...";
+            btn.disabled = true;
+
+            try {
+                const now = new Date();
+                const timeString = now.toTimeString().split(' ')[0].replace(/:/g, '-'); 
+                const sessionId = `${className}_${date}_${timeString}`;
+
+                await setDoc(doc(db, "attendance_sessions", sessionId), {
+                    className: className,
+                    date: date,
+                    time: now.toLocaleTimeString(),
+                    teacher: currentUserEmail,
+                    timestamp: now,
+                    details: attendance
+                });
+
+                alert("Session Recorded Successfully!");
+            } catch (e) {
+                alert("Error: " + e.message);
+            } finally {
+                btn.innerText = "SAVE SESSION RECORD";
+                btn.disabled = false;
+            }
+        },
+
+        generateReport: async () => {
+            const className = document.getElementById('class-select').value;
+            if(!className) return alert("Please select a class first");
+
+            const modal = document.getElementById('report-modal');
+            const tbody = document.getElementById('report-body');
+            document.getElementById('report-class-title').innerText = `Report: ${className}`;
+            
+            modal.classList.remove('hidden');
+            tbody.innerHTML = `<tr><td colspan="3" class="text-center p-4"><div class="spinner mx-auto"></div>Calculating...</td></tr>`;
+
+            try {
+                const q = query(collection(db, "attendance_sessions"), where("className", "==", className));
+                const querySnapshot = await getDocs(q);
+
+                let studentStats = {}; 
+
+                students.forEach(s => {
+                    studentStats[s.roll] = { name: s.name, present: 0, total: 0 };
+                });
+
+                querySnapshot.forEach(doc => {
+                    const sessionData = doc.data().details;
+                    
+                    for (const [roll, status] of Object.entries(sessionData)) {
+                        if(!studentStats[roll]) continue; 
+                        studentStats[roll].total += 1;
+                        if(status === "Present") {
+                            studentStats[roll].present += 1;
+                        }
+                    }
+                });
+
+                tbody.innerHTML = "";
+                Object.entries(studentStats).forEach(([roll, stats]) => {
+                    const percentage = stats.total === 0 ? 0 : Math.round((stats.present / stats.total) * 100);
+                    
+                    let colorClass = "text-gray-800";
+                    if(percentage < 75) colorClass = "text-red-600 font-bold";
+                    else if(percentage >= 90) colorClass = "text-green-600 font-bold";
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>
+                            <div class="font-bold text-gray-700">${stats.name}</div>
+                            <div class="text-[10px] text-gray-400">${roll}</div>
+                        </td>
+                        <td class="text-center">${stats.present} / ${stats.total}</td>
+                        <td class="${colorClass} text-center">${percentage}%</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+            } catch (e) {
+                console.error(e);
+                tbody.innerHTML = `<tr><td colspan="3" class="text-red-500 text-center">Error fetching report</td></tr>`;
+            }
+        }
+    };
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUserEmail = user.email;
+            document.getElementById('current-user-display').innerText = user.email;
+            document.getElementById('page-login').classList.add('hidden');
+            document.getElementById('page-dashboard').classList.remove('hidden');
+            document.getElementById('page-dashboard').classList.add('flex');
+            document.getElementById('date-select').valueAsDate = new Date();
+        } else {
+            document.getElementById('page-login').classList.remove('hidden');
+            document.getElementById('page-dashboard').classList.add('hidden');
+            document.getElementById('page-dashboard').classList.remove('flex');
+        }
+    });
+</script>
+</body>
+</html>
