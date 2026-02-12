@@ -1,0 +1,27 @@
+📝 Important Notes
+🔹 For OCR to Work
+
+You must install Tesseract OCR Engine separately:
+
+Download from: https://github.com/tesseract-ocr/tesseract
+
+Add Tesseract to your system PATH
+
+Or set path manually inside ocr.py:
+
+pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+
+🔹 If Using PostgreSQL (Optional)
+
+Add:
+
+psycopg2-binary==2.9.9
+
+🔹 If Using MySQL (Optional)
+
+Add:
+
+mysql-connector-python==8.3.0
+
+🚀 Install All Dependencies
+pip install -r requirements.txt
