@@ -2,10 +2,10 @@
 AI-Based Voice and Messaging System for Automated Fee and Attendance Notifications
 👥 Team No: 2
 
-Sk. Jaberulla – Dept. of Computer Science & Engineering
-Kara Sai Krishna Chandana
-Shaik Salma
-Chintala Kalpana Reddy
+Sk. Jaberulla – Dept. of Computer Science & Engineering,
+Kara Sai Krishna Chandana,
+Shaik Salma,
+Chintala Kalpana Reddy,
 Katikala Kiranmai – Dept. of Allied Computer Science & Engineering
 Institution:
 Vignan’s Lara Institute of Technology & Science, Vadlamudi
@@ -142,4 +142,5 @@ SMS Gateway Support
 Cloud Deployment
 Admin Role Management
 Real-time Attendance Tracking
+
 
