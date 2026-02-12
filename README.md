@@ -1,190 +1,145 @@
-🎓 SmartEduAlerts
+📢 Smart Edu Alerts
+AI-Based Voice and Messaging System for Automated Fee and Attendance Notifications
+👥 Team No: 2
 
-AI-Based Voice + Telegram Notification System for Automated Fees and Attendance Alerts
+Sk. Jaberulla – Dept. of Computer Science & Engineering
+Kara Sai Krishna Chandana
+Shaik Salma
+Chintala Kalpana Reddy
+Katikala Kiranmai – Dept. of Allied Computer Science & Engineering
+Institution:
+Vignan’s Lara Institute of Technology & Science, Vadlamudi
 
 📌 Project Overview
+Smart Edu Alerts is an AI-powered notification system designed to automate student fee and attendance communication between educational institutions and parents.
+Traditional methods like phone calls, notice boards, and manual messaging are time-consuming, error-prone, and inefficient. This system leverages Artificial Intelligence, OCR, Machine Learning, Text-to-Speech (TTS), and Telegram integration to deliver instant voice and message alerts.
+The system ensures:
+->Timely communication
+->Reduced manual workload
+->Improved transparency
+->Real-time alert delivery
 
-SmartEduAlerts is an AI-powered automation system designed to improve communication between educational institutions and parents.
-It automatically detects low attendance and pending fee conditions from institutional records and sends real-time text and voice alerts via Telegram.
+🚀 Key Features
+📂 Upload student data (CSV, Excel, PDF)
+🔍 OCR-based data extraction
+🤖 ML-based fee prediction/analysis
+🔊 AI-based Voice Alerts using gTTS
+💬 Telegram Bot Messaging Integration
+🌐 Web Dashboard Interface
+🗃️ MySQL/PostgreSQL compatible backend
+📊 CSV-based student data processing
 
-Traditional manual notification methods are slow, error-prone, and labor-intensive. SmartEduAlerts eliminates these limitations using OCR, AI/NLP, Text-to-Speech, and Telegram Bot APIs.
-
-<details> <summary><strong>✨ Key Features</strong></summary>
-
-📄 OCR-based extraction from PDF, Excel, and image records
-
-🤖 AI/NLP-driven detection of attendance shortages & fee dues
-
-🔔 Automated Telegram text notifications
-
-🔊 Multilingual voice alerts (English, Telugu, Hindi)
-
-⚡ Near real-time alert delivery
-
-📊 Admin monitoring & alert logging
-
-💰 Zero-cost messaging using Telegram Bot API
-
-</details>
-<details> <summary><strong>🛠️ Technologies Used</strong></summary>
-Backend & AI
-
+🛠️ Technologies Used
 Python
-
 Flask
-
-OCR (Tesseract / EasyOCR)
-
-NLP (Rule-based / ML)
-
-Text-to-Speech (gTTS)
-
-Communication
-
+OpenCV
+OCR
+gTTS (Google Text-to-Speech)
 Telegram Bot API
+Machine Learning (Scikit-learn)
+Pickle (.pkl model files)
+HTML (Frontend Templates)
 
-Data Handling
-
-CSV / Excel
-
-PDF parsing
-
-</details>
-<details> <summary><strong>⚙️ System Workflow</strong></summary>
-
-Upload attendance & fee documents
-
-OCR extracts structured student data
-
-AI analyzes attendance thresholds & fee status
-
-Personalized alerts are generated
-
-Telegram bot sends text & voice notifications
-
-Delivery logs and status are stored
-
-</details>
-📁 Project Structure
-<details> <summary><strong>📂 Click to view folder structure</strong></summary>
+📂 Project Folder Structure
 SmartEduAlerts/
 │
-├── __pycache__/                 # Python cache files
+├── __pycache__/
+├── database/
 │
-├── modules/                     # Core application modules
-│   ├── ocr_module.py            # OCR-based document extraction
-│   ├── nlp_module.py            # Attendance & fee alert analysis
-│   ├── tts_module.py            # Text-to-Speech voice generation
-│   └── telegram_bot.py          # Telegram Bot API integration
+├── modules/
+│   ├── __pycache__/
+│   ├── analyzer.py
+│   ├── ml_predictor.py
+│   ├── ocr.py
+│   ├── parser.py
+│   ├── telegram_bot.py
+│   ├── translator.py
+│   ├── tts.py
 │
 ├── static/
-│   └── audio/                   # Generated MP3 voice alerts
+│   └── audio/
+│       ├── en.mp3
+│       ├── hi.mp3
+│       ├── te.mp3
+│       └── ur.mp3
 │
-├── templates/                   # HTML templates (Admin UI)
-│   ├── index.html               # File upload & dashboard
-│   └── result.html              # Alert preview & status
+├── templates/
+│   ├── dashboard.html
+│   ├── upload.html
 │
-├── app.py                       # Main Flask application
-├── config.py                    # Configuration & API keys
-│
-├── students.csv                 # Student master dataset
-├── data_full.csv                # Combined attendance & fee data
-│
-├── training_data.csv            # ML training dataset
-├── training_data_full.csv       # Extended training dataset
-│
-├── train_model.py               # Model training script
-├── ml_model.pkl                 # Trained ML model
-├── fee_encoder.pkl              # Encoded fee status model
-│
-├── README.md                    # Project documentation
+├── app.py
+├── config.py
+├── data_full.csv
+├── fee_encoder.pkl
+├── ml_model.pkl
+├── students.csv
+├── train_model.py
+├── training_data_full.csv
+├── training_data.csv
 
-</details>
-<details> <summary><strong>🧠 Folder & File Description</strong></summary>
 
-modules/ – Core logic for OCR, AI analysis, voice generation, and Telegram alerts
+⚙️ Module Description
+🔹 app.py
+Main Flask application file that runs the web server and connects all modules.
 
-static/audio/ – Stores generated MP3 voice alerts
+🔹 config.py
+Contains configuration details like Telegram Bot Token and other credentials.
 
-templates/ – Web UI for document upload and alert preview
+🔹 modules/
+analyzer.py – Analyzes student attendance and fee records
+ml_predictor.py – Uses trained ML model to predict fee-related outputs
+ocr.py – Extracts text from uploaded PDF/Images
+parser.py – Parses and processes CSV/Excel data
+telegram_bot.py – Sends automated alerts via Telegram
+translator.py – Multi-language message support
+tts.py – Generates voice alerts using Text-to-Speech
 
-app.py – Central controller connecting all modules
+🔹 static/audio/
+Stores generated voice alert audio files in multiple languages:
+English (en.mp3)
+Hindi (hi.mp3)
+Telugu (te.mp3)
+Urdu (ur.mp3)
 
-config.py – Telegram token, thresholds, and system configuration
+🔹 templates/
+dashboard.html – Displays system dashboard
+upload.html – Upload student data interface
 
-CSV & PKL files – Training datasets and trained ML models
+🔹 ML Model Files
+ml_model.pkl – Trained Machine Learning model
+fee_encoder.pkl – Label encoder for fee data
 
-</details>
-<details> <summary><strong>🚀 How to Run the Project</strong></summary>
-Clone Repository
-git clone https://github.com/your-username/SmartEduAlerts.git
-cd SmartEduAlerts
+🧠 Methodology
+->Upload Student Records (CSV/PDF/Excel)
+->OCR & Data Parsing
+->ML-based Fee & Attendance Analysis
+->Generate Alert Message
+->Convert Message to Voice (TTS)
+->Send Telegram Message + Voice Alert
+-Dashboard Monitoring
 
-Install Dependencies
+🎯 Objectives
+Automate attendance & fee notification system
+Reduce administrative manual workload
+Deliver real-time personalized alerts
+Improve parent-institution communication
+
+▶️ How to Run the Project
+1️⃣ Install Dependencies
 pip install -r requirements.txt
-
-Configure Telegram Bot
-
-Create a bot using @BotFather
-
-Copy the BOT_TOKEN
-
-Add it in config.py or environment variables
-
-Run Application
+2️⃣ Configure Telegram Bot
+Edit config.py and add your Telegram Bot Token.
+3️⃣ Train ML Model (Optional)
+python train_model.py
+4️⃣ Run Application
 python app.py
+5️⃣ Open in Browser
+http://127.0.0.1:5000/
 
-</details>
-<details> <summary><strong>📊 Results</strong></summary>
-
-⏱️ 95% reduction in processing time
-
-🎯 98% fee alert accuracy
-
-🎯 96% attendance alert accuracy
-
-⚡ < 1 second Telegram delivery time
-
-🔊 4.7/5 parent comprehension score
-
-📉 85% reduction in administrative workload
-
-</details>
-<details> <summary><strong>🔮 Future Enhancements</strong></summary>
-
-Exam result and performance alerts
-
-WhatsApp integration
-
-Predictive academic risk analysis
-
-Parent acknowledgment tracking
-
-Mobile admin dashboard
-
-</details>
-<details> <summary><strong>📚 IEEE Conference Context</strong></summary>
-
-This project is developed as part of an IEEE conference submission, focusing on:
-
-AI-driven educational automation
-
-Institutional communication optimization
-
-Accessibility through voice-based alerts
-
-</details>
-<details> <summary><strong>👨‍💻 Contributors</strong></summary>
-
-Team 2 – SmartEduAlerts
-Department of Computer Science
-IEEE Conference Project
-
-</details>
-<details> <summary><strong>📜 License</strong></summary>
-
-This project is intended for academic and research purposes only.
-Reuse is permitted with proper citation.
-
-</details>
+🔐 Future Enhancements
+WhatsApp API Integration
+SMS Gateway Support
+Cloud Deployment
+Admin Role Management
+Real-time Attendance Tracking
 
